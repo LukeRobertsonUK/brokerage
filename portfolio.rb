@@ -4,11 +4,11 @@ class Portfolio
   def initialize(name, type)
     @name = name
     @type = type
-    @holdings = []
+    @holdings = {}
   end
 
   def to_s
-    "#{name} is a #{type} fund with #{holdings.size} holdings"
+    "#{name}: #{type} fund with #{holdings.size} holdings"
   end
 
 

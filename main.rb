@@ -21,7 +21,7 @@ end
 
 
 def new_account(account_list)
-  condition = true
+  conditions = true
   puts "Please supply the following information for the client..."
   puts "Name:"
   n = gets.chomp.to_s
@@ -30,7 +30,7 @@ def new_account(account_list)
   account_list.each do |account_object|
     if (account_object.name == n) && (account_object.address == a)
       puts "\nTHIS CLIENT ALREADY EXISTS!!!"
-      condition = false
+      conditions = false
       puts
     end
   end
@@ -50,13 +50,17 @@ def new_account(account_list)
     end
       puts "New account created..."
       puts account_list[-1].to_s_long
-      condition = false
+      conditions = false
   end
 end
 
-
-
-
+def get_quote(account)
+  puts "Please supply a ticker:"
+  ticker = gets.chomp.upcase.to_s
+  puts "#{YahooFinance::get_standard_quotes(ticker)[ticker].name} last traded at #{YahooFinance::get_standard_quotes(ticker)[ticker].lastTrade}"
+  puts "You could purchase up to #{((account.cash_balance + account.credit_limit) / YahooFinance::get_standard_quotes(ticker)[ticker].lastTrade).to_i} shares with your available funds."
+  return ticker
+end
 
 
 condition = true
@@ -105,15 +109,81 @@ while condition
           n = gets.chomp
           puts "\nWhat type of fund is it (pension, regular trading etc)?"
           t = gets.chomp
-          accounts[choice].portfolios[t.downcase] = Portfolio.new(n, t)
+          accounts[choice].portfolios << Portfolio.new(n, t)
           puts"\nPortfolio has been created >>>"
-          puts accounts[choice].portfolios[t.downcase].to_s
+          puts accounts[choice].portfolios[-1].to_s
         when "4"
-          puts "---------------------------------------------------------------------"
-          puts "\nPORTFOLIOS"
+          if accounts[choice].portfolios.empty?
+            puts "\nTHIS CLIENT HAS NO PORTFOLIOS. PLEASE CREATE ONE BEFORE TRYING TO TRADE"
+          else
+            puts "---------------------------------------------------------------------"
+            puts "PORTFOLIOS"
+            accounts[choice].list_portfolios
+            puts "---------------------------------------------------------------------"
+            puts "\nPlease select a portfolio number on which to trade:"
+            portfolio_choice = (gets.chomp.to_i) -1
+            puts "---------------------------------------------------------------------"
+            puts "TRADING MENU FOR #{accounts[choice].portfolios[portfolio_choice].to_s}"
+            puts "---------------------------------------------------------------------"
+            puts "(1) Get a stock quote"
+            puts "(2) Make a stock PURCHASE"
+            puts "(3) Make a stock SALE"
+            puts "(4) "
+            trading_choice = gets.chomp.downcase.to_s
+            case trading_choice
+              when '1'
+                get_quote(accounts[choice])
+              when "2"
+                shares_to_buy = get_quote(accounts[choice])
+                puts "How many shares would the client like to buy?"
+                number_to_buy = gets.chomp.to_i
+                purchase_price = YahooFinance::get_standard_quotes(shares_to_buy)[shares_to_buy].lastTrade
+                if (purchase_price * number_to_buy) <= (accounts[choice].credit_limit + accounts[choice].cash_balance)
+                  sufficient_funds = true
+                else
+                  puts "You do not have sufficient funds to complete this transaction!"
+                  sufficient_funds = false
+                end
+                while sufficient_funds
+                  if accounts[choice].portfolios[portfolio_choice].holdings.include?(shares_to_buy)
+                    accounts[choice].portfolios[portfolio_choice].holdings[shares_to_buy].num_shares += number_to_buy
+                    accounts[choice].cash_balance -= purchase_price*number_to_buy
+                    puts "CLIENT BUYS #{number_to_buy} shares of #{shares_to_buy} at $#{purchase_price}"
+                    sufficient_funds = false
+                  else
+                    accounts[choice].portfolios[portfolio_choice].holdings[shares_to_buy] = Holding.new(shares_to_buy, number_to_buy)
+                    accounts[choice].cash_balance -= purchase_price*number_to_buy
+                    puts "CLIENT BUYS #{number_to_buy} shares of #{shares_to_buy} at $#{purchase_price}"
+                    sufficient_funds = false
+                  end
+                end
+              when "3"
+                shares_to_sell = get_quote(accounts[choice])
+                sale_price = YahooFinance::get_standard_quotes(shares_to_buy)[shares_to_buy].lastTrade
+                if accounts[choice].portfolios[portfolio_choice].holdings.include?(shares_to_sell)
+          binding.pry
 
-          puts "---------------------------------------------------------------------"
+                  puts "You currently hold #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares} shares of #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].share_name}"
+                  puts "How many would you like to sell?"
+                  number_to_sell = gets.chomp.to_i
+                  if number_to_sell > accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares
+                    puts "YOU CAN'T SELL MORE SHARES THAN YOU OWN!"
+                  else
+                    accounts[choice].cash_balance += sale_price*number_to_sell
+                    puts "CLIENT SELLS #{number_to_sell} shares of #{shares_to_sell} at $#{sale_price}"
+                    accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares -= number_to_sell
+                    if accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares = 0
+                      accounts[choice].portfolios[portfolio_choice].holdings.delete(shares_to_sell)
+                    end
+                  end
+                end
 
+
+
+
+
+            end
+          end
 
   binding.pry
 
@@ -136,14 +206,14 @@ while condition
 
   end
 
-  puts "\nPress <Return> for Main Menu or Q to quit"
-  condition = false if gets.chomp.downcase == "q"
 
 
 
 end
 
 
+  puts "\nPress <Return> for Main Menu or Q to quit"
+  condition = false if gets.chomp.downcase == "q"
 
 
 

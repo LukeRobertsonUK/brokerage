@@ -1,5 +1,5 @@
 class ClientAccount
-  attr_accessor :name, :address, :telephone, :cash_balance, :credit_limit, :portfolios
+  attr_accessor :name, :address, :telephone, :cash_balance, :credit_limit, :portfolios, :available_funds
 
   def initialize(name, address, telephone, cash_balance, credit_limit = 0)
     @name = name
@@ -7,7 +7,8 @@ class ClientAccount
     @telephone = telephone
     @cash_balance = cash_balance
     @credit_limit = credit_limit
-    @portfolios = {}
+    @portfolios = []
+    @available_funds = @cash_balance + @credit_limit
   end
 
 
@@ -30,5 +31,12 @@ class ClientAccount
     puts "Credit limit increased..."
     puts self.to_s_long
   end
+
+  def list_portfolios
+    portfolios.each_index do |index|
+      puts "#{index +1}) #{portfolios[index].to_s}"
+    end
+  end
+
 
 end
