@@ -19,14 +19,16 @@ class ClientAccount
    "#{name} of #{address}\nPortfolios: #{portfolios.size}\nCash balance: $#{cash_balance}\nCredit_limit: $#{credit_limit}\nAvailable for purchases: $#{cash_balance + credit_limit}"
   end
 
-
-
-
   def increase_balance(amount)
-    cash balance += amount
-    puts "Cash balance increased"
-    to_s_long
+    @cash_balance += amount
+    puts "Cash balance increased..."
+    puts self.to_s_long
   end
 
+  def increase_credit(amount)
+    @credit_limit += amount
+    puts "Credit limit increased..."
+    puts self.to_s_long
+  end
 
 end
