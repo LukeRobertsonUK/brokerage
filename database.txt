@@ -1,5 +1,7 @@
-Luke Robertson; London; 07799-896-180; 17390.149999999998; 5000.0; Retirement / Pension /  <==> ISA / Savings / PG @ 10.0 <==> Kids Uni / Savings / GOOG @ 5.0 ** FB @ 5.0 ** AAPL @ 5.0 <==> Spivvy Trading account / trading / FB @ 5.0
-Brian Robson; Manchester; 8989898; 19100.0; 3200.0; Retirement / Pension / AAPL @ 15.0
-Arnold; Oldham; 4554545453453; 25000.0; 0.0; 
-Geoff Banks; Sheffield; 23432434324; 19000.0; 0.0; 
-David Gower; Lords; 23432434234; 13000.0; 1000.0; 
+Luke Robertson; London; 07799-896-180; 5512.299999999999; 5000.0; Retirement / Pension /  <==> ISA / Savings /  <==> Kids Uni / Savings / FB @ 5.0 ** AAPL @ 5.0 <==> Spivvy Trading Account / Trading / FB @ 500.0
+Brian Robson; Manchester; 07777-777-777; 19300.0; 4800.0; Retirement / Pension / AAPL @ 15.0 ** AAP @ 100.0 ** GM @ 100.0 ** XOM @ 25.0 <==> ISA / Savings / T @ 200.0
+Arnold Bennett; Oldham; 07777-777-777; 25000.0; 0.0; Retirement / Pension /  <==> ISA / Savings / PG @ 10.0 <==> Kids Uni / Savings / GOOG @ 5.0 ** FB @ 5.0 ** AAPL @ 5.0 <==> Spivvy Trading Account / Trading / FB @ 5.0
+Geoff Banks; Sheffield; 07777-777-777; 19000.0; 0.0; Retirement / Pension /  <==> ISA / Savings / PG @ 10.0 <==> Kids Uni / Savings / GOOG @ 5.0 ** GM @ 5.0 ** AAPL @ 5.0 <==> Spivvy Trading Account / Trading / FB @ 5.0
+David Gower; Lords; 07777-777-777; 3091.48; 1000.0; Retirement / Pension /  <==> ISA / Savings / PG @ 10.0 <==> Kids Uni / Savings / GOOG @ 5.0 ** AAPL @ 5.0 ** BA @ 100 <==> Spivvy Trading Account / Trading / PFE @ 5.0 <==> Funeral Fund / Long Term Savings /  <==> Rainy Day / Savings / 
+Henry VIII; England; 07777-777-777; 200000.0; 10000.0; 
+Albus Dumbledore; Hogwarts; 07777-896-180; 23000.0; 0; Gringotts / regular savings / 

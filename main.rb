@@ -107,16 +107,35 @@ def new_account(account_list)
   end
 end
 
-def get_quote(account, buy= true)
+def get_quote(account, buy)
   puts "Please supply a ticker:"
   ticker = gets.chomp.upcase.to_s
   puts "#{YahooFinance::get_standard_quotes(ticker)[ticker].name} last traded at #{YahooFinance::get_standard_quotes(ticker)[ticker].lastTrade}"
-  puts "#{account.name} could purchase up to #{((account.cash_balance + account.credit_limit) / YahooFinance::get_standard_quotes(ticker)[ticker].lastTrade).to_i} shares with available funds."
+  if buy
+    puts "#{account.name} could purchase up to #{((account.cash_balance + account.credit_limit) / YahooFinance::get_standard_quotes(ticker)[ticker].lastTrade).to_i} shares with available funds."
+  end
   return ticker
 end
 
-
-
+def grab_positive_number(limit = nil)
+  puts "Please enter a number:"
+  num = gets.chomp.to_f
+  if limit
+    if num == 0 || num > limit
+      print "Try again... "
+      grab_positive_number(limit)
+    else
+      num
+    end
+else
+    if num == 0
+      print "Try again... "
+      grab_positive_number
+    else
+      num
+    end
+  end
+end
 
 
 condition = true
@@ -128,41 +147,36 @@ while condition
   puts"\nMAIN MENU"
   puts"(1) List existing clients and display account options"
   puts"(2) Create a new client account"
-  puts "\nPlease pick a number:"
-  response = gets.chomp.to_s.downcase
+  response = grab_positive_number(2)
   case response
-    when "1"
+    when 1
       puts "---------------------------------------------------------------------"
       puts "CLIENT LIST"
         accounts.each_index do |index|
           puts "#{index +1}) #{accounts[index].to_s}"
         end
       puts "---------------------------------------------------------------------"
-      puts "\nEnter a client account number for further options:"
-      choice = (gets.chomp.to_i) -1
-      if (choice +1) > accounts.size
-        puts "THAT IS NOT ONE OF THE OPTIONS!"
-      else
-        puts "\nYou have selected the account belonging to #{accounts[choice].name} of #{accounts[choice].address}"
-        puts "What would you like to do next?"
-        puts "\n(1) Increase cash balance"
-        puts "(2) Increase credit limit"
-        puts "(3) View holdings by portfolio"
-        puts "(4) Create a new portfolio"
-        puts "(5) Trade"
-        pick = gets.chomp.downcase.to_s
+      choice = (grab_positive_number(accounts.size).to_i) -1
+      puts "\nYou have selected the account belonging to #{accounts[choice].name} of #{accounts[choice].address}"
+      puts "What would you like to do next?"
+      puts "\n(1) Increase cash balance"
+      puts "(2) Increase credit limit"
+      puts "(3) View holdings by portfolio"
+      puts "(4) Create a new portfolio"
+      puts "(5) Trade"
+        pick = grab_positive_number(5).to_i
         case pick
-          when "1"
+          when 1
             puts "\nHow much cash would you like to add?:"
-            cash_to_add = gets.chomp.to_f
+            cash_to_add = grab_positive_number
             accounts[choice].increase_balance(cash_to_add)
-          when "2"
+          when 2
             puts "\nHow much cash would you like to add?:"
-            cash_to_add = gets.chomp.to_f
+            cash_to_add = grab_positive_number
             accounts[choice].increase_credit(cash_to_add)
-          when "3"
+          when 3
             accounts[choice].display_holdings_by_portfolio
-          when "4"
+          when 4
             puts "\nWhat would you like to call this portfolio?"
             n = gets.chomp
             puts "\nWhat type of fund is it (pension, regular trading etc)?"
@@ -170,7 +184,7 @@ while condition
             accounts[choice].portfolios << Portfolio.new(n, t)
             puts"\nPortfolio has been created >>>"
             puts accounts[choice].portfolios[-1].to_s
-          when "5"
+          when 5
             if accounts[choice].portfolios.empty?
               puts "\nTHIS CLIENT HAS NO PORTFOLIOS. PLEASE CREATE ONE BEFORE TRYING TO TRADE"
             else
@@ -179,7 +193,7 @@ while condition
               accounts[choice].list_portfolios
               puts "---------------------------------------------------------------------"
               puts "\nPlease select a portfolio number on which to trade:"
-              portfolio_choice = (gets.chomp.to_i) -1
+              portfolio_choice = (grab_positive_number(accounts[choice].portfolios.size).to_i) -1
               puts "---------------------------------------------------------------------"
               puts "SELECTED PORTFOLIO CONTAINS THE FOLLOWING HOLDINGS"
               puts "---------------------------------------------------------------------"
@@ -190,14 +204,14 @@ while condition
               puts "(1) Get a stock QUOTE"
               puts "(2) Make a stock PURCHASE"
               puts "(3) Make a stock SALE"
-              trading_choice = gets.chomp.downcase.to_s
+              trading_choice = grab_positive_number(3).to_i
               case trading_choice
-                when '1'
-                  get_quote(accounts[choice])
-                when "2"
-                  shares_to_buy = get_quote(accounts[choice])
-                  puts "Enter purchase amount:"
-                  number_to_buy = gets.chomp.to_i
+                when 1
+                  get_quote(accounts[choice], true)
+                when 2
+                  shares_to_buy = get_quote(accounts[choice], true)
+                  puts "Purchase Amount"
+                  number_to_buy = grab_positive_number.to_i
                   purchase_price = YahooFinance::get_standard_quotes(shares_to_buy)[shares_to_buy].lastTrade
                   if (purchase_price * number_to_buy) <= (accounts[choice].credit_limit + accounts[choice].cash_balance)
                     sufficient_funds = true
@@ -224,13 +238,13 @@ while condition
                       sufficient_funds = false
                     end
                   end
-                when "3"
-                  shares_to_sell = get_quote(accounts[choice])
+                when 3
+                  shares_to_sell = get_quote(accounts[choice], false)
                   sale_price = YahooFinance::get_standard_quotes(shares_to_sell)[shares_to_sell].lastTrade
                   if accounts[choice].portfolios[portfolio_choice].holdings.include?(shares_to_sell)
                     puts "Current holding: #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares} shares of #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].share_name}"
-                    puts "Enter sale amount:?"
-                    number_to_sell = gets.chomp.to_i
+                    puts "Sale Amount"
+                    number_to_sell = grab_positive_number.to_i
                     if number_to_sell > accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares
                       puts "CLIENT CAN'T SELL MORE SHARES THAN THEY OWN!"
                     else
@@ -250,14 +264,9 @@ while condition
               end
             end
           end
-        end
-    when "2"
+    when 2
       new_account(accounts)
-    else
-      puts "Sorry, that's not one of the available options..."
-
   end
-
   puts "\nPress <Return> for MAIN MENU or Q to SAVE AND QUIT"
   if gets.chomp.downcase == "q"
         save_data(accounts, "database.txt")
