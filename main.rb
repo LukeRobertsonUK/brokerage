@@ -45,6 +45,7 @@ ensure
   f.close
 end
 
+# Backup database and save to database.txt
 def save_data(accounts, filename)
 FileUtils.copy(filename, "backup.txt")
 save_file = File.new(filename, 'w')
@@ -106,11 +107,11 @@ def new_account(account_list)
   end
 end
 
-def get_quote(account)
+def get_quote(account, buy= true)
   puts "Please supply a ticker:"
   ticker = gets.chomp.upcase.to_s
   puts "#{YahooFinance::get_standard_quotes(ticker)[ticker].name} last traded at #{YahooFinance::get_standard_quotes(ticker)[ticker].lastTrade}"
-  puts "You could purchase up to #{((account.cash_balance + account.credit_limit) / YahooFinance::get_standard_quotes(ticker)[ticker].lastTrade).to_i} shares with your available funds."
+  puts "#{account.name} could purchase up to #{((account.cash_balance + account.credit_limit) / YahooFinance::get_standard_quotes(ticker)[ticker].lastTrade).to_i} shares with available funds."
   return ticker
 end
 
@@ -127,10 +128,7 @@ while condition
   puts"\nMAIN MENU"
   puts"(1) List existing clients and display account options"
   puts"(2) Create a new client account"
-  puts"(3) Options for individual client accounts"
-  puts"(4)    "
-  puts"(5)     "
-  puts"(6)     "
+  puts "\nPlease pick a number:"
   response = gets.chomp.to_s.downcase
   case response
     when "1"
@@ -142,105 +140,121 @@ while condition
       puts "---------------------------------------------------------------------"
       puts "\nEnter a client account number for further options:"
       choice = (gets.chomp.to_i) -1
-      puts "\nYou have selected the account belonging to #{accounts[choice].name} of #{accounts[choice].address}"
-      puts "What would you like to do next?"
-      puts "(1) Increase cash balance"
-      puts "(2) Increase credit limit"
-      puts "(3) View holdings by portfolio"
-      puts "(4) Create a new portfolio"
-      puts "(5) Trade"
-      pick = gets.chomp.downcase.to_s
-      case pick
-        when "1"
-          puts "\nHow much cash would you like to add?:"
-          cash_to_add = gets.chomp.to_f
-          accounts[choice].increase_balance(cash_to_add)
-        when "2"
-          puts "\nHow much cash would you like to add?:"
-          cash_to_add = gets.chomp.to_f
-          accounts[choice].increase_credit(cash_to_add)
-        when "3"
-          accounts[choice].display_holdings_by_portfolio
-        when "4"
-          puts "\nWhat would you like to call this portfolio?"
-          n = gets.chomp
-          puts "\nWhat type of fund is it (pension, regular trading etc)?"
-          t = gets.chomp
-          accounts[choice].portfolios << Portfolio.new(n, t)
-          puts"\nPortfolio has been created >>>"
-          puts accounts[choice].portfolios[-1].to_s
-        when "5"
-          if accounts[choice].portfolios.empty?
-            puts "\nTHIS CLIENT HAS NO PORTFOLIOS. PLEASE CREATE ONE BEFORE TRYING TO TRADE"
-          else
-            puts "---------------------------------------------------------------------"
-            puts "PORTFOLIOS"
-            accounts[choice].list_portfolios
-            puts "---------------------------------------------------------------------"
-            puts "\nPlease select a portfolio number on which to trade:"
-            portfolio_choice = (gets.chomp.to_i) -1
-            puts "---------------------------------------------------------------------"
-            puts "TRADING MENU FOR #{accounts[choice].portfolios[portfolio_choice].to_s}"
-            puts "---------------------------------------------------------------------"
-            puts "(1) Get a stock quote"
-            puts "(2) Make a stock PURCHASE"
-            puts "(3) Make a stock SALE"
-            puts "(4) "
-            trading_choice = gets.chomp.downcase.to_s
-            case trading_choice
-              when '1'
-                get_quote(accounts[choice])
-              when "2"
-                shares_to_buy = get_quote(accounts[choice])
-                puts "How many shares would the client like to buy?"
-                number_to_buy = gets.chomp.to_i
-                purchase_price = YahooFinance::get_standard_quotes(shares_to_buy)[shares_to_buy].lastTrade
-                if (purchase_price * number_to_buy) <= (accounts[choice].credit_limit + accounts[choice].cash_balance)
-                  sufficient_funds = true
-                else
-                  puts "You do not have sufficient funds to complete this transaction!"
-                  sufficient_funds = false
-                end
-                while sufficient_funds
-                  if accounts[choice].portfolios[portfolio_choice].holdings.include?(shares_to_buy)
-                    accounts[choice].portfolios[portfolio_choice].holdings[shares_to_buy].num_shares += number_to_buy
-                    accounts[choice].cash_balance -= purchase_price*number_to_buy
-                    puts "CLIENT BUYS #{number_to_buy} shares of #{shares_to_buy} at $#{purchase_price}"
-                    sufficient_funds = false
+      if (choice +1) > accounts.size
+        puts "THAT IS NOT ONE OF THE OPTIONS!"
+      else
+        puts "\nYou have selected the account belonging to #{accounts[choice].name} of #{accounts[choice].address}"
+        puts "What would you like to do next?"
+        puts "\n(1) Increase cash balance"
+        puts "(2) Increase credit limit"
+        puts "(3) View holdings by portfolio"
+        puts "(4) Create a new portfolio"
+        puts "(5) Trade"
+        pick = gets.chomp.downcase.to_s
+        case pick
+          when "1"
+            puts "\nHow much cash would you like to add?:"
+            cash_to_add = gets.chomp.to_f
+            accounts[choice].increase_balance(cash_to_add)
+          when "2"
+            puts "\nHow much cash would you like to add?:"
+            cash_to_add = gets.chomp.to_f
+            accounts[choice].increase_credit(cash_to_add)
+          when "3"
+            accounts[choice].display_holdings_by_portfolio
+          when "4"
+            puts "\nWhat would you like to call this portfolio?"
+            n = gets.chomp
+            puts "\nWhat type of fund is it (pension, regular trading etc)?"
+            t = gets.chomp
+            accounts[choice].portfolios << Portfolio.new(n, t)
+            puts"\nPortfolio has been created >>>"
+            puts accounts[choice].portfolios[-1].to_s
+          when "5"
+            if accounts[choice].portfolios.empty?
+              puts "\nTHIS CLIENT HAS NO PORTFOLIOS. PLEASE CREATE ONE BEFORE TRYING TO TRADE"
+            else
+              puts "---------------------------------------------------------------------"
+              puts "PORTFOLIOS"
+              accounts[choice].list_portfolios
+              puts "---------------------------------------------------------------------"
+              puts "\nPlease select a portfolio number on which to trade:"
+              portfolio_choice = (gets.chomp.to_i) -1
+              puts "---------------------------------------------------------------------"
+              puts "SELECTED PORTFOLIO CONTAINS THE FOLLOWING HOLDINGS"
+              puts "---------------------------------------------------------------------"
+              accounts[choice].portfolios[portfolio_choice].display_holdings
+              puts "---------------------------------------------------------------------"
+              puts "TRADING MENU"
+              puts "---------------------------------------------------------------------"
+              puts "(1) Get a stock QUOTE"
+              puts "(2) Make a stock PURCHASE"
+              puts "(3) Make a stock SALE"
+              trading_choice = gets.chomp.downcase.to_s
+              case trading_choice
+                when '1'
+                  get_quote(accounts[choice])
+                when "2"
+                  shares_to_buy = get_quote(accounts[choice])
+                  puts "Enter purchase amount:"
+                  number_to_buy = gets.chomp.to_i
+                  purchase_price = YahooFinance::get_standard_quotes(shares_to_buy)[shares_to_buy].lastTrade
+                  if (purchase_price * number_to_buy) <= (accounts[choice].credit_limit + accounts[choice].cash_balance)
+                    sufficient_funds = true
                   else
-                    accounts[choice].portfolios[portfolio_choice].holdings[shares_to_buy] = Holding.new(shares_to_buy, number_to_buy)
-                    accounts[choice].cash_balance -= purchase_price*number_to_buy
-                    puts "CLIENT BUYS #{number_to_buy} shares of #{shares_to_buy} at $#{purchase_price}"
+                    puts "TRANSACTION CANCELLED, INSUFFICIENT FUNDS!"
                     sufficient_funds = false
                   end
-                end
-              when "3"
-                shares_to_sell = get_quote(accounts[choice])
-                sale_price = YahooFinance::get_standard_quotes(shares_to_buy)[shares_to_buy].lastTrade
-                if accounts[choice].portfolios[portfolio_choice].holdings.include?(shares_to_sell)
-
-
-                  puts "You currently hold #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares} shares of #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].share_name}"
-                  puts "How many would you like to sell?"
-                  number_to_sell = gets.chomp.to_i
-                  if number_to_sell > accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares
-                    puts "YOU CAN'T SELL MORE SHARES THAN YOU OWN!"
-                  else
-                    accounts[choice].cash_balance += sale_price*number_to_sell
-                    puts "CLIENT SELLS #{number_to_sell} shares of #{shares_to_sell} at $#{sale_price}"
-                    accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares -= number_to_sell
-                    if accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares = 0
-                      accounts[choice].portfolios[portfolio_choice].holdings.delete(shares_to_sell)
+                  while sufficient_funds
+                    if accounts[choice].portfolios[portfolio_choice].holdings.include?(shares_to_buy)
+                      accounts[choice].portfolios[portfolio_choice].holdings[shares_to_buy].num_shares += number_to_buy
+                      accounts[choice].cash_balance -= purchase_price*number_to_buy
+                      puts "CLIENT BUYS #{number_to_buy} shares of #{shares_to_buy} at $#{purchase_price}"
+                      puts "UPDATED PORTFOLIO HOLDINGS:"
+                      accounts[choice].portfolios[portfolio_choice].display_holdings
+                      accounts[choice].to_s_long
+                      sufficient_funds = false
+                    else
+                      accounts[choice].portfolios[portfolio_choice].holdings[shares_to_buy] = Holding.new(shares_to_buy, number_to_buy)
+                      accounts[choice].cash_balance -= purchase_price*number_to_buy
+                      puts "CLIENT BUYS #{number_to_buy} shares of #{shares_to_buy} at $#{purchase_price}"
+                      puts "UPDATED PORTFOLIO HOLDINGS:"
+                      accounts[choice].portfolios[portfolio_choice].display_holdings
+                      accounts[choice].to_s_long
+                      sufficient_funds = false
                     end
                   end
-                end
+                when "3"
+                  shares_to_sell = get_quote(accounts[choice])
+                  sale_price = YahooFinance::get_standard_quotes(shares_to_sell)[shares_to_sell].lastTrade
+                  if accounts[choice].portfolios[portfolio_choice].holdings.include?(shares_to_sell)
+                    puts "Current holding: #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares} shares of #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].share_name}"
+                    puts "Enter sale amount:?"
+                    number_to_sell = gets.chomp.to_i
+                    if number_to_sell > accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares
+                      puts "CLIENT CAN'T SELL MORE SHARES THAN THEY OWN!"
+                    else
+                      accounts[choice].cash_balance += sale_price*number_to_sell
+                      puts "CLIENT SELLS #{number_to_sell} shares of #{shares_to_sell} at $#{sale_price}"
+                      accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares -= number_to_sell
+                      if accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares = 0
+                        accounts[choice].portfolios[portfolio_choice].holdings.delete(shares_to_sell)
+                      end
+                      puts "UPDATED PORTFOLIO HOLDINGS:"
+                      accounts[choice].portfolios[portfolio_choice].display_holdings
+                      accounts[choice].to_s_long
+                    end
+                  else
+                    puts"CLIENT DOES NOT HAVE ANY SHARES TO SELL!"
+                  end
+              end
             end
           end
         end
-
     when "2"
       new_account(accounts)
-    when "3"
+    else
+      puts "Sorry, that's not one of the available options..."
 
   end
 

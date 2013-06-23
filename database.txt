@@ -1,2 +1,5 @@
-Luke Robertson; London; 07799-896-180; 10000; 5000; Retirement / Pension / AAPL @ 10 ** FB @ 5 <==> ISA / Savings / PG @ 10 <==> Kids Uni / Savings / GOOG @ 5 ** FB @ 5 <==> Spivvy Trading account / trading / FB @ 5
-Brian Robson; Manchester; 8989898; 19000; 3000; Retirement / Pension / AAPL @ 15
+Luke Robertson; London; 07799-896-180; 17390.149999999998; 5000.0; Retirement / Pension /  <==> ISA / Savings / PG @ 10.0 <==> Kids Uni / Savings / GOOG @ 5.0 ** FB @ 5.0 ** AAPL @ 5.0 <==> Spivvy Trading account / trading / FB @ 5.0
+Brian Robson; Manchester; 8989898; 19100.0; 3200.0; Retirement / Pension / AAPL @ 15.0
+Arnold; Oldham; 4554545453453; 25000.0; 0.0; 
+Geoff Banks; Sheffield; 23432434324; 19000.0; 0.0; 
+David Gower; Lords; 23432434234; 13000.0; 1000.0; 
