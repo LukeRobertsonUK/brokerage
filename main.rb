@@ -40,6 +40,40 @@ ensure
 end
 
 
+# def save_database(file)
+#   f= File.new(file, 'w')
+# end
+
+
+
+
+def save_data(filename)
+save_file = File.new('saver.txt', 'w')
+
+begin
+accounts.each do |account|
+    array_of_portfolio_strings = []
+    account.portfolios.each do |portfolio|
+      array_of_holding_strings = []
+      portfolio.holdings.each_value do |holding|
+        holding_string = holding.ticker + " @ " + holding.num_shares.to_s
+        array_of_holding_strings << holding_string
+        end
+        portfolio_holdings_string = array_of_holding_strings.join(" ** ")
+        portfolio_string = portfolio.name + " / " + portfolio.type + " / " + portfolio_holdings_string
+        array_of_portfolio_strings << portfolio_string
+    end
+    account_portfolios_string = array_of_portfolio_strings.join(" <==> ")
+    account_string = account.name + "; " + account.address + "; " + account.telephone + "; " + account.cash_balance + "; " + account.credit_limit + "; " + account_portfolios_string
+    save_file.puts account_string
+  end
+
+ensure
+save_file.close
+
+end
+
+
 
 def new_account(account_list)
   conditions = true
