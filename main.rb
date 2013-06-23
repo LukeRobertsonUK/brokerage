@@ -53,7 +53,7 @@ def new_account(account_list)
       puts
     end
   end
-  while condition
+  while conditions
     puts "Telephone:"
     t = gets.chomp.to_s
     puts "Initial cash balance:"
@@ -72,6 +72,8 @@ def new_account(account_list)
       conditions = false
   end
 end
+
+
 
 def get_quote(account)
   puts "Please supply a ticker:"
@@ -180,7 +182,7 @@ while condition
                 shares_to_sell = get_quote(accounts[choice])
                 sale_price = YahooFinance::get_standard_quotes(shares_to_buy)[shares_to_buy].lastTrade
                 if accounts[choice].portfolios[portfolio_choice].holdings.include?(shares_to_sell)
-          binding.pry
+
 
                   puts "You currently hold #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].num_shares} shares of #{accounts[choice].portfolios[portfolio_choice].holdings[shares_to_sell].share_name}"
                   puts "How many would you like to sell?"
@@ -196,47 +198,18 @@ while condition
                     end
                   end
                 end
-
-
-
-
-
             end
           end
-
-  binding.pry
-
-
-
-
-
+        end
 
     when "2"
       new_account(accounts)
     when "3"
 
-
-
-
-
-
-
-
-
   end
-
-
-
-
-end
-
 
   puts "\nPress <Return> for Main Menu or Q to quit"
   condition = false if gets.chomp.downcase == "q"
-
-
-
-
 
 end
 
