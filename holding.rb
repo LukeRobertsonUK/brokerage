@@ -6,7 +6,7 @@ class Holding
     @num_shares = num_shares
     @share_name = YahooFinance::get_standard_quotes(@ticker.to_s)[@ticker.to_s].name
     @share_price = YahooFinance::get_standard_quotes(@ticker.to_s)[@ticker.to_s].lastTrade
-    @holding_value = @share_price * @num_shares
+
   end
 
   def to_s

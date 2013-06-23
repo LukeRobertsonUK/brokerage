@@ -6,18 +6,37 @@ require_relative 'portfolio'
 require_relative 'holding'
 
 
-f = File.new('account_list.txt', 'r')
-
+# Pull in data from database file
+f = File.new('database.txt', 'r')
 begin
-  accounts = []
-  f.each do |line|
-    account_array = line.chomp.split('/ ')
-    account = ClientAccount.new(account_array[0], account_array[1], account_array[2], account_array[3].to_f, account_array[4].to_f)
-    accounts << account
+accounts = []
+f.each do |line|
+  account_array = line.chomp.split('; ')
+  account = ClientAccount.new(account_array[0], account_array[1], account_array[2], account_array[3].to_f, account_array[4].to_f)
+  portfolios = []
+  array_of_portfolios = account_array[5].split(' <==> ')
+  array_of_portfolios.each do |portfolio_element|
+    array_within_portfolio = portfolio_element.split(' / ')
+    portfolio = Portfolio.new(array_within_portfolio[0], array_within_portfolio[1])
+    holdings = {}
+    # binding.pry
+    array_of_holdings = array_within_portfolio[2].split(' ** ')
+    array_of_holdings.each do |holding_element|
+      array_within_holding = holding_element.split(' @ ')
+      holding = Holding.new(array_within_holding[0], array_within_holding[1])
+      holdings[holding.ticker] = holding
   end
+    portfolio.holdings = holdings
+    portfolios << portfolio
+  end
+  account.portfolios = portfolios
+  accounts << account
+end
+
 ensure
   f.close
 end
+
 
 
 def new_account(account_list)
