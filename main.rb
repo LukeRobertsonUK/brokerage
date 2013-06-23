@@ -5,6 +5,8 @@ require_relative 'client_account'
 require_relative 'portfolio'
 require_relative 'holding'
 
+puts `clear`
+puts "LOADING DATA..."
 
 # Pull in data from database file
 f = File.new('database.txt', 'r')
@@ -23,7 +25,7 @@ f.each do |line|
     array_of_holdings = array_within_portfolio[2].split(' ** ')
     array_of_holdings.each do |holding_element|
       array_within_holding = holding_element.split(' @ ')
-      holding = Holding.new(array_within_holding[0], array_within_holding[1])
+      holding = Holding.new(array_within_holding[0], array_within_holding[1].to_f)
       holdings[holding.ticker] = holding
   end
     portfolio.holdings = holdings
@@ -84,6 +86,13 @@ def get_quote(account)
 end
 
 
+
+
+
+
+
+
+
 condition = true
 while condition
   puts `clear`
@@ -113,8 +122,9 @@ while condition
       puts "What would you like to do next?"
       puts "(1) Increase cash balance"
       puts "(2) Increase credit limit"
-      puts "(3) Create a new portfolio"
-      puts "(4) Trade"
+      puts "(3) View holdings by portfolio"
+      puts "(4) Create a new portfolio"
+      puts "(5) Trade"
       pick = gets.chomp.downcase.to_s
       case pick
         when "1"
@@ -126,6 +136,8 @@ while condition
           cash_to_add = gets.chomp.to_f
           accounts[choice].increase_credit(cash_to_add)
         when "3"
+          accounts[choice].display_holdings_by_portfolio
+        when "4"
           puts "\nWhat would you like to call this portfolio?"
           n = gets.chomp
           puts "\nWhat type of fund is it (pension, regular trading etc)?"
@@ -133,7 +145,7 @@ while condition
           accounts[choice].portfolios << Portfolio.new(n, t)
           puts"\nPortfolio has been created >>>"
           puts accounts[choice].portfolios[-1].to_s
-        when "4"
+        when "5"
           if accounts[choice].portfolios.empty?
             puts "\nTHIS CLIENT HAS NO PORTFOLIOS. PLEASE CREATE ONE BEFORE TRYING TO TRADE"
           else

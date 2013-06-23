@@ -13,11 +13,11 @@ class ClientAccount
 
 
   def to_s
-    "#{name} of #{address}:\t#{portfolios.size} portfolios\t $#{cash_balance + credit_limit} available for purchases"
+    "#{name} of #{address}:\t#{portfolios.size} portfolios valued at $#{account_value}\t  $#{cash_balance + credit_limit} available for purchases"
   end
 
   def to_s_long
-   "#{name} of #{address}\nPortfolios: #{portfolios.size}\nCash balance: $#{cash_balance}\nCredit_limit: $#{credit_limit}\nAvailable for purchases: $#{cash_balance + credit_limit}"
+   "#{name} of #{address}\nPortfolios: #{portfolios.size}\nCombined portfolio value: $#{account_value}\nCash balance: $#{cash_balance}\nCredit_limit: $#{credit_limit}\nAvailable for purchases: $#{cash_balance + credit_limit}"
   end
 
   def increase_balance(amount)
@@ -35,6 +35,23 @@ class ClientAccount
   def list_portfolios
     portfolios.each_index do |index|
       puts "#{index +1}) #{portfolios[index].to_s}"
+    end
+  end
+
+  def account_value
+    value = 0
+    portfolios.each do |portfolio|
+     value += portfolio.portfolio_value
+    end
+    value.round(2)
+  end
+
+  def display_holdings_by_portfolio
+    portfolios.each do |portfolio|
+      puts "\n---------------------------------------------------------------------"
+      puts portfolio.to_s
+      puts "---------------------------------------------------------------------"
+      portfolio.display_holdings
     end
   end
 
