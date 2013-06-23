@@ -5,6 +5,9 @@ require_relative 'client_account'
 require_relative 'portfolio'
 require_relative 'holding'
 
+include FileUtils
+
+
 puts `clear`
 puts "LOADING DATA..."
 
@@ -16,20 +19,23 @@ f.each do |line|
   account_array = line.chomp.split('; ')
   account = ClientAccount.new(account_array[0], account_array[1], account_array[2], account_array[3].to_f, account_array[4].to_f)
   portfolios = []
-  array_of_portfolios = account_array[5].split(' <==> ')
-  array_of_portfolios.each do |portfolio_element|
-    array_within_portfolio = portfolio_element.split(' / ')
-    portfolio = Portfolio.new(array_within_portfolio[0], array_within_portfolio[1])
-    holdings = {}
-    # binding.pry
-    array_of_holdings = array_within_portfolio[2].split(' ** ')
-    array_of_holdings.each do |holding_element|
-      array_within_holding = holding_element.split(' @ ')
-      holding = Holding.new(array_within_holding[0], array_within_holding[1].to_f)
-      holdings[holding.ticker] = holding
-  end
-    portfolio.holdings = holdings
-    portfolios << portfolio
+  if account_array[5]
+    array_of_portfolios = account_array[5].split(' <==> ')
+    array_of_portfolios.each do |portfolio_element|
+      array_within_portfolio = portfolio_element.split(' / ')
+      portfolio = Portfolio.new(array_within_portfolio[0], array_within_portfolio[1])
+      holdings = {}
+    if array_within_portfolio[2]
+      array_of_holdings = array_within_portfolio[2].split(' ** ')
+      array_of_holdings.each do |holding_element|
+        array_within_holding = holding_element.split(' @ ')
+        holding = Holding.new(array_within_holding[0], array_within_holding[1].to_f)
+        holdings[holding.ticker] = holding
+      end
+    end
+      portfolio.holdings = holdings
+      portfolios << portfolio
+    end
   end
   account.portfolios = portfolios
   accounts << account
@@ -39,41 +45,32 @@ ensure
   f.close
 end
 
-
-# def save_database(file)
-#   f= File.new(file, 'w')
-# end
-
-
-
-
-def save_data(filename)
-save_file = File.new('saver.txt', 'w')
-
-begin
-accounts.each do |account|
-    array_of_portfolio_strings = []
-    account.portfolios.each do |portfolio|
-      array_of_holding_strings = []
-      portfolio.holdings.each_value do |holding|
-        holding_string = holding.ticker + " @ " + holding.num_shares.to_s
-        array_of_holding_strings << holding_string
-        end
-        portfolio_holdings_string = array_of_holding_strings.join(" ** ")
-        portfolio_string = portfolio.name + " / " + portfolio.type + " / " + portfolio_holdings_string
-        array_of_portfolio_strings << portfolio_string
+def save_data(accounts, filename)
+FileUtils.copy(filename, "backup.txt")
+save_file = File.new(filename, 'w')
+  begin
+  accounts.each do |account|
+      array_of_portfolio_strings = []
+      account.portfolios.each do |portfolio|
+        array_of_holding_strings = []
+        portfolio.holdings.each_value do |holding|
+          holding_string = holding.ticker + " @ " + holding.num_shares.to_s
+          array_of_holding_strings << holding_string
+          end
+          portfolio_holdings_string = array_of_holding_strings.join(" ** ")
+          portfolio_string = portfolio.name + " / " + portfolio.type + " / " + portfolio_holdings_string
+          array_of_portfolio_strings << portfolio_string
+      end
+      account_portfolios_string = array_of_portfolio_strings.join(" <==> ")
+      account_string = account.name + "; " + account.address + "; " + account.telephone + "; " + account.cash_balance.to_s + "; " + account.credit_limit.to_s + "; " + account_portfolios_string
+      save_file.puts account_string
     end
-    account_portfolios_string = array_of_portfolio_strings.join(" <==> ")
-    account_string = account.name + "; " + account.address + "; " + account.telephone + "; " + account.cash_balance + "; " + account.credit_limit + "; " + account_portfolios_string
-    save_file.puts account_string
+
+  ensure
+  save_file.close
+
   end
-
-ensure
-save_file.close
-
 end
-
-
 
 def new_account(account_list)
   conditions = true
@@ -109,8 +106,6 @@ def new_account(account_list)
   end
 end
 
-
-
 def get_quote(account)
   puts "Please supply a ticker:"
   ticker = gets.chomp.upcase.to_s
@@ -123,10 +118,6 @@ end
 
 
 
-
-
-
-
 condition = true
 while condition
   puts `clear`
@@ -134,7 +125,6 @@ while condition
   puts"*$*$*$*$* BROKERAGE APPLICATION *$*$*$*$*"
   puts"*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*$*"
   puts"\nMAIN MENU"
-  puts"\nAccount Administration"
   puts"(1) List existing clients and display account options"
   puts"(2) Create a new client account"
   puts"(3) Options for individual client accounts"
@@ -254,8 +244,10 @@ while condition
 
   end
 
-  puts "\nPress <Return> for Main Menu or Q to quit"
-  condition = false if gets.chomp.downcase == "q"
-
+  puts "\nPress <Return> for MAIN MENU or Q to SAVE AND QUIT"
+  if gets.chomp.downcase == "q"
+        save_data(accounts, "database.txt")
+    condition = false
+  end
 end
 
