@@ -2,6 +2,6 @@ Luke Robertson; London; 07799-896-180; 5512.299999999999; 5000.0; Retirement / P
 Brian Robson; Manchester; 07777-777-777; 19300.0; 4800.0; Retirement / Pension / AAPL @ 15.0 ** AAP @ 100.0 ** GM @ 100.0 ** XOM @ 25.0 <==> ISA / Savings / T @ 200.0
 Arnold Bennett; Oldham; 07777-777-777; 25000.0; 0.0; Retirement / Pension /  <==> ISA / Savings / PG @ 10.0 <==> Kids Uni / Savings / GOOG @ 5.0 ** FB @ 5.0 ** AAPL @ 5.0 <==> Spivvy Trading Account / Trading / FB @ 5.0
 Geoff Banks; Sheffield; 07777-777-777; 19000.0; 0.0; Retirement / Pension /  <==> ISA / Savings / PG @ 10.0 <==> Kids Uni / Savings / GOOG @ 5.0 ** GM @ 5.0 ** AAPL @ 5.0 <==> Spivvy Trading Account / Trading / FB @ 5.0
-David Gower; Lords; 07777-777-777; 3091.48; 1000.0; Retirement / Pension /  <==> ISA / Savings / PG @ 10.0 <==> Kids Uni / Savings / GOOG @ 5.0 ** AAPL @ 5.0 ** BA @ 100 <==> Spivvy Trading Account / Trading / PFE @ 5.0 <==> Funeral Fund / Long Term Savings /  <==> Rainy Day / Savings / 
+David Gower; Lords; 07777-777-777; 3091.48; 1000.0; Retirement / Pension /  <==> ISA / Savings / PG @ 10.0 <==> Kids Uni / Savings / GOOG @ 5.0 ** AAPL @ 5.0 ** BA @ 100.0 <==> Spivvy Trading Account / Trading / PFE @ 5.0 <==> Funeral Fund / Long Term Savings /  <==> Rainy Day / Savings / 
 Henry VIII; England; 07777-777-777; 200000.0; 10000.0; 
-Albus Dumbledore; Hogwarts; 07777-896-180; 23000.0; 0; Gringotts / regular savings / 
+Albus Dumbledore; Hogwarts; 07777-896-180; 2325.0; 0.0; Gringotts / regular savings / AAPL @ 50.0
